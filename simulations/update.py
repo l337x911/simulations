@@ -66,7 +66,7 @@ async def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="updates VERSION on repos by increment 1.")
     parser.add_argument("paths", nargs='+', help="path of repositories")
-    parser.add_argument("--lambda", dest='lambd', type=float, default=0.5, help="lambda for frequency of updates per day.")
+    parser.add_argument("--lambda", dest='lambd', type=float, default=0.25, help="lambda for frequency of updates per day.")
 
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s:%(process)d:%(levelname)s:%(message)s")
