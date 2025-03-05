@@ -56,7 +56,10 @@ async def schedule_updates(path: Path, path_index: int, lambd: float):
         await t
 
 async def main(args):
-    tasks = [asyncio.create_task(schedule_updates(Path(p), i, args.lambd)) for i, p in enumerate(args.paths)]
+    lambd = args.lambd
+    if datetime.now().weekday() >= 5:
+        lambd *= args.weekend_discount 
+    tasks = [asyncio.create_task(schedule_updates(Path(p), i, lambd)) for i, p in enumerate(args.paths)]
     
     for t in tasks:
         await t
@@ -66,6 +69,7 @@ async def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="updates VERSION on repos by increment 1.")
     parser.add_argument("paths", nargs='+', help="path of repositories")
+    parser.add_argument("--weekend-discount", dest='weekend_discount', type=float, default=0.1, help="discount to lambda frequency for weekend.")
     parser.add_argument("--lambda", dest='lambd', type=float, default=0.25, help="lambda for frequency of updates per day.")
 
     args = parser.parse_args()
