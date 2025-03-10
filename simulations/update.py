@@ -49,16 +49,16 @@ async def schedule_updates(path: Path, path_index: int, lambd: float):
 
     delays = [_transform_to_workday_seconds(r.random()) for _ in range(freq)]
 
-    logging.info(f"updating {path} at {delays} times with seed {seed}.")
+    logging.info(f"{1./lambd:.3f} generated {freq} updates for {path} at {delays} times with seed {seed}.")
 
     tasks = [increment_version_after(d, path / "VERSION") for d in delays]
     for t in tasks:
         await t
 
-async def main(args):
-    lambd = args.lambd
-    if datetime.now().weekday() >= 5:
-        lambd = lambd * args.weekend_discount 
+async def main(args):    
+    mean = args.mean * args.weekend_discount if datetime.now().weekday() >= 5 else args.mean
+
+    lambd = 1. / mean
     tasks = [asyncio.create_task(schedule_updates(Path(p), i, lambd)) for i, p in enumerate(args.paths)]
     
     for t in tasks:
@@ -69,10 +69,10 @@ async def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="updates VERSION on repos by increment 1.")
     parser.add_argument("paths", nargs='+', help="path of repositories")
-    parser.add_argument("--weekend-discount", dest='weekend_discount', type=float, default=0.1, help="discount to lambda frequency for weekend.")
-    parser.add_argument("--lambda", dest='lambd', type=float, default=0.1, help="lambda for frequency of updates per day.")
+    parser.add_argument("--weekend-discount", dest='weekend_discount', type=float, default=0.1, help="discount to frequency for weekend.")
+    parser.add_argument("--mean", dest='mean', type=float, default=0.33, help="mean frequency of updates per day.")
 
     args = parser.parse_args()
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s:%(process)d:%(levelname)s:%(message)s")
+    logging.basicConfig(filename="/tmp/simulation_update.log", filemode='a', level=logging.INFO, format="%(asctime)s:%(process)d:%(levelname)s:%(message)s")
 
     asyncio.run(main(args))
