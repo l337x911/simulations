@@ -70,7 +70,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="updates VERSION on repos by increment 1.")
     parser.add_argument("paths", nargs='+', help="path of repositories")
     parser.add_argument("--weekend-discount", dest='weekend_discount', type=float, default=0.1, help="discount to frequency for weekend.")
-    parser.add_argument("--mean", dest='mean', type=float, default=0.33, help="mean frequency of updates per day.")
+    parser.add_argument("--mean", dest='mean', type=float, default=0.66, help="mean frequency of updates per day.")
 
     args = parser.parse_args()
     logging.basicConfig(filename="/tmp/simulation_update.log", filemode='a', level=logging.INFO, format="%(asctime)s:%(process)d:%(levelname)s:%(message)s")
